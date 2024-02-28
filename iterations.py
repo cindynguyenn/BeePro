@@ -40,9 +40,9 @@ def record_audio(event, duration, iterations):
     global recording
     fs = 4000
     file_number = 1
-                
+          
+    i = 0      
     while event != 'Quit' and recording:
-        i = 0
         while i in range(iterations):
             now = datetime.now()
             date_string = now.strftime("%m-%d-%Y")
@@ -69,8 +69,11 @@ def record_audio(event, duration, iterations):
                 print("-> Uploading to DropBox & getting ready to Delete...")
                 print("--------------------------------------------------------------")                    
                 upload_to_dropbox(file_name, directory_to_watch)
+            
+            if recording == False:
+                break;
                 
-                i += 1
+        i += 1
             
             
 
@@ -91,7 +94,7 @@ frame_layout = [[sg.Multiline("", size=(80, 20), autoscroll=True, key='-OUTPUT-'
 layout = [
     [sg.Frame("Output Console", frame_layout)],
     [sg.Text('Duration (in seconds)'), sg.InputText(key='newTime', size=(6,1)), sg.Button('Set')],
-    [sg.Text('Iterations'), sg.InputText(key = 'sampleNumbers', size=(6,1)), sg.Button('Iterate')],
+    [sg.Text('Iterations'), sg.InputText(key = 'newIteration', size=(6,1)), sg.Button('Iterate')],
     [sg.Button("R/U to Google Drive"), sg.Button('R/U to DropBox'), sg.Button("Run Locally"), sg.Button('Open ML'), sg.Button('Stop'), sg.Button('Quit')]
 ]
 
@@ -116,20 +119,20 @@ while True:
         break
 # RUN LOCALLY OR GOOGLE UPLOAD ----------------------------------------------------------------------------------------
     elif event in ['Run Locally', 'R/U to Google Drive']:
-        if not values ['newTime'] or not values ['sampleNumbers']:
+        if not values ['newTime'] or not values ['newIteration']:
             print("Please set both duration and iterations before starting recording.")
             continue
         recording = True  # Start recording
         duration = int(values['newTime'])
-        iterations = int(values['sampleNumbers'])
-        threading.Thread(target=record_audio, args=(event, duration), daemon=True).start()
+        iterations = int(values['newIteration'])
+        threading.Thread(target=record_audio, args=(event, duration, iterations), daemon=True).start()
 # DURATION SET BUTTON -------------------------------------------------------------------------------------------------
     elif event == 'Set':
         duration = int(values['newTime'])
         print("--> Duration has been set to: ", duration, "seconds" )
 # ITERATION BUTTON ----------------------------------------------------------------------------------------------------
     elif event == 'Iterate':
-        iterations = int(values['sampleNumbers'])
+        iterations = int(values['newIteration'])
         print("--> You have set", iterations, "iterations")
 # STOP BUTTON ---------------------------------------------------------------------------------------------------------     
     elif event == 'Stop':  # New event handler for the 'Stop' button
@@ -146,13 +149,13 @@ while True:
 # RUN AND UPLOAD TO DROPBOX -------------------------------------------------------------------------------------------
     elif event == 'R/U to DropBox':
         print("\nRunning and Uploading to DropBox. Starting...")
-        if not values ['newTime'] or not values ['sampleNumbers']:
+        if not values ['newTime'] or not values ['newIteration']:
             print("Please set both duration and iterations before starting recording.")
             continue
         recording = True  # Start recording
         duration = int(values['newTime'])
         print("--> Duration has been set to: ", duration, "seconds" )
-        threading.Thread(target=record_audio, args=(event, duration), daemon=True).start()
+        threading.Thread(target=record_audio, args=(event, duration, iterations), daemon=True).start()
 # ---------------------------------------------------------------------------------------------------------------------
 sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
 window.close()
