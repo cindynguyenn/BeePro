@@ -71,7 +71,7 @@ def record_audio(event, duration, fs):
 def record_hourly(event, duration, fs):
     global recording
     file_number = 1
-                    
+                        
     while event != 'Quit' and recording:
         now = datetime.now()
         current_date = now.date()
@@ -101,6 +101,42 @@ def record_hourly(event, duration, fs):
                 print("--------------------------------------------------------------")                    
                 upload_to_dropbox(file_name, directory_to_watch)
                 
+def record_start(event, duration, fs, start_time, end_time):
+    global recording
+    file_number = 1
+    
+    while event != 'Quit' and recording:
+        now = datetime.now()
+        date_string = now.strftime("%m-%d-%Y")
+        time_string = now.strftime("%H-%M-%S")
+        current_time = now.strftime("%H:%M:00")
+                    
+        if current_time == start_time.strftime("%H:%M:00"):
+            file_name = f"Beehive{file_number}-{date_string}-{time_string}.wav"                
+            
+            print(f"-> Recording File [{file_number}]...")
+            myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+            sd.wait()
+            write(file_name, fs, myrecording)
+
+            print(f"File saved as {file_name}")
+            print(f"{file_number} file(s) recorded in this session so far. Length: {duration} seconds.\n")
+                
+            file_number += 1
+            if event == 'R/U to Google Drive' and recording == True:
+                print("-> Saving on Google Drive...")
+                print("--------------------------------------------------------------")                    
+                call("./googleUpload", shell=True)
+                    
+            if event == 'R/U to DropBox' and recording == True:
+                print("        ")
+                print("-> Uploading to DropBox & getting ready to Delete...")
+                print("--------------------------------------------------------------")                    
+                upload_to_dropbox(file_name, directory_to_watch)
+        elif current_time == end_time.strftime("%H:%M:00"):
+            print("Recording has finished.")
+            recording = False
+                
 class Unbuffered(object):
     def __init__(self, window):
         self.window = window
@@ -119,7 +155,9 @@ layout = [
     [sg.Frame("Output Console", frame_layout)],
     [sg.Text('Duration (in seconds)'), sg.InputText(key='newTime', size=(6,1)), sg.Button('Set')],
     [sg.Text('Desired Sample Rate'), sg.InputText(key = 'sampleRate', size=(6,1)), sg.Button('Set Sample Rate')],
-    [sg.Button("R/U to Google Drive"), sg.Button('R/U to DropBox'), sg.Button("Run Continuously"), sg.Button("Run Hourly"), sg.Button('Open ML'), sg.Button('Stop'), sg.Button('Quit')]
+    [sg.Text('Start Time (HH:MM)'), sg.InputText(key = 'startTime', size=(10,1)), sg.Text('End Time (HH:MM)'), sg.InputText(key = 'endTime', size=(10,1)), sg.Button('Set Time')],
+    [sg.Text('Start Date (MM/DD/YYYY)'), sg.InputText(key = 'startDate', size=(10,1)), sg.Text('End Date (MM/DD/YYYY)'), sg.InputText(key = 'endDate', size=(10,1)), sg.Button('Set Date')],
+    [sg.Button("R/U to Google Drive"), sg.Button('R/U to DropBox'), sg.Button("Run Continuously"), sg.Button("Run Hourly"), sg.Button("Start"), sg.Button('Open ML'), sg.Button('Stop'), sg.Button('Quit')]
 ]
 
 window = sg.Window("BeePro - Version 3.0", layout, finalize=True)
@@ -166,6 +204,20 @@ while True:
         duration = int(values['newTime'])
         fs = int(values['sampleRate'])
         threading.Thread(target=record_hourly, args=(event, duration, fs), daemon=True).start()
+# START AND END TIME ---------------------------------------------------------------------------------------------------
+    elif event in ['Start']:
+        if not values ['newTime'] or not values ['sampleRate'] or not values ['startTime'] or not values ['endTime']:
+            print("Please set a duration, sample rate, start time, and end time before starting recording.")
+            continue
+        print("RECORDING SHORTLY...")
+        recording = True  # Start recording
+        duration = int(values['newTime'])
+        fs = int(values['sampleRate'])
+        start_time = datetime.strptime(values['startTime'], '%H:%M')
+        end_time = datetime.strptime(values['endTime'], '%H:%M')
+        # start_date = datetime.strptime(values['startDate'], '%m/%d/%Y')
+        # end_date = datetime.strptime(values['endDate'], '%m/%d/%Y')
+        threading.Thread(target=record_start, args=(event, duration, fs, start_time, end_time), daemon=True).start()
 # DURATION SET BUTTON -------------------------------------------------------------------------------------------------
     elif event == 'Set':
         duration = int(values['newTime'])
@@ -175,13 +227,21 @@ while True:
         fs = int(values['sampleRate'])
         print ("--> Your desired sample rate is: ", fs)
 # SET TIME BUTTON -----------------------------------------------------------------------------------------------------
-    # elif event == 'Set Time':
-    #     start_time_str = values['startTime'] + ':00'
-    #     end_time_str = values['endTime'] + ':00'
-    #     # This will parse the time strings into datetime objects.
-    #     start_time = datetime.strptime(start_time_str, '%H:%M:%S').time()
-    #     end_time = datetime.strptime(end_time_str, '%H:%M:%S').time()
-    #     print ("--> Start time has been set to:", start_time, "and end time has been set to:", end_time)
+    elif event == 'Set Time':
+        start_time_str = values['startTime'] + ':00'
+        end_time_str = values['endTime'] + ':00'
+        # This will parse the time strings into datetime objects.
+        start_time = datetime.strptime(start_time_str, '%H:%M:%S').time()
+        end_time = datetime.strptime(end_time_str, '%H:%M:%S').time()
+        print ("--> Start time has been set to:", start_time, "and end time has been set to:", end_time)
+# DATE SET BUTTON -----------------------------------------------------------------------------------------------------
+    elif event == 'Set Date':
+        start_date_str = values['startDate']
+        end_date_str = values['endDate']
+        # This will parse the date strings into datetime objects.
+        start_date = datetime.strptime(start_date_str, '%m/%d/%Y').time()
+        end_date = datetime.strptime(end_date_str, '%m/%d/%Y').time()
+        print ("--> Start date has been set to:", start_date, "and end date has been set to:", end_date)
 # STOP BUTTON ---------------------------------------------------------------------------------------------------------     
     elif event == 'Stop':  # New event handler for the 'Stop' button
         recording = False  # Stop recording
