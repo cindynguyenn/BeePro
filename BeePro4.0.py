@@ -130,7 +130,7 @@ def main():
     print(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print(" |           __          . '  '  .   ")
     print(" |        _/__)         .     .              .    Welcome to BeePro.")
-    print(" |     (8|)_}}--  .        .               .       Linux Version 3.0  ")
+    print(" |     (8|)_}}--  .        .               .       Linux Version 4.0  ")
     print(" |        `\__)     ' .  .  '  '  .   .  '    ")
     print(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
 
@@ -180,9 +180,9 @@ def main():
         elif choice == '4':
             start_date_str = input("Enter start date (MM/DD/YYYY): ")
             end_date_str = input("Enter end date (MM/DD/YYYY): ")
-            start_date = datetime.strptime(start_date_str, '%m/%d/%Y').time()
-            end_date = datetime.strptime(end_date_str, '%m/%d/%Y').time()
-            print ("--> Start date has been set to:", start_date, "and end date has been set to:", end_date)
+            start_date = datetime.strptime(start_date_str, '%m/%d/%Y')
+            end_date = datetime.strptime(end_date_str, '%m/%d/%Y')
+            print ("--> Start date has been set to:", start_date.strftime('%m/%d/%Y'), "and end date has been set to:", end_date.strftime('%m/%d/%Y'))
         elif choice == '5':
             recording = True 
             threading.Thread(target=record_audio, args=(duration, fs), daemon=True).start()
