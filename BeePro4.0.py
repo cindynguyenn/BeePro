@@ -11,11 +11,12 @@ import dropbox
 from dropbox.files import WriteMode
 
 # REMINDER FOR SELF
+# DIRECTORY TO WATCH NEEDS TO BE ADJUSTED!!!
+# FIX THE NAMING PATH!!
+
 # START AND END TIME WORK, BUT DO NOT LOOP. HAS NOT BEEN IMPLEMENTED YET
 # ADD OPTION TO RECORD_START FOR START AND END TIME
 # FIGURE OUT START AND END DATE PORTION OF CODE
-# maybe fix r/u to drpobox and google drive. make separate functions so error does not show up while we are waiting on wifi?
-# FIX THE NAMING PATH!!
 
 recording = False
 
