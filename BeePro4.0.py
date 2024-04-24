@@ -42,7 +42,7 @@ def upload_to_dropbox(file_name, full_file_path):
         print(f"An error occurred with file {file_name}: {e} - Couldn't Upload to DropBox, saved locally.")
     
 
-def record_audio(duration, fs):
+def record_audio(beehive, duration, fs):
     global recording
     file_number = 1
                     
@@ -50,7 +50,8 @@ def record_audio(duration, fs):
         now = datetime.now()
         date_string = now.strftime("%m-%d-%Y")
         time_string = now.strftime("%H-%M-%S")
-        file_name = f"Beehive{file_number}-{date_string}-{time_string}.wav"                
+        file_name = f"{beehive}{file_number}-{date_string}-{time_string}.wav"
+        #file_name = f"Beehive{file_number}-{date_string}-{time_string}.wav"                
         
         print(f"-> Recording File [{file_number}]...")
         myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
@@ -61,10 +62,10 @@ def record_audio(duration, fs):
         print(f"{file_number} file(s) recorded in this session so far. Length: {duration} seconds.\n")
             
         file_number += 1
-        print("        ")
-        print("-> Uploading to DropBox & getting ready to Delete...")
-        print("--------------------------------------------------------------")                    
-        upload_to_dropbox(file_name, directory_to_watch)
+        # print("        ")
+        # print("-> Uploading to DropBox & getting ready to Delete...")
+        # print("--------------------------------------------------------------")                    
+        # upload_to_dropbox(file_name, directory_to_watch)
         
         if not recording:
             break  # Exit the loop when recording is stopped
@@ -91,10 +92,10 @@ def record_hourly(duration, fs):
             print(f"{file_number} file(s) recorded in this session so far. Length: {duration} seconds.\n")
                 
             file_number += 1
-            print("        ")
-            print("-> Uploading to DropBox & getting ready to Delete...")
-            print("--------------------------------------------------------------")                    
-            upload_to_dropbox(file_name, directory_to_watch)
+            # print("        ")
+            # print("-> Uploading to DropBox & getting ready to Delete...")
+            # print("--------------------------------------------------------------")                    
+            # upload_to_dropbox(file_name, directory_to_watch)
                 
 def record_start(duration, fs, start_time, end_time):
     global recording
@@ -140,6 +141,7 @@ def main():
     print("The current date and time is:", formatted_datetime)
     
     print("Set the following parameters before recording: ")
+    beehive = input("Enter the name of the beehive you are recording: ")
     duration = int(input("Enter the duration (in seconds): "))
     fs = int(input("Enter the desired sample rate: "))
     
@@ -186,19 +188,19 @@ def main():
             print ("--> Start date has been set to:", start_date.strftime('%m/%d/%Y'), "and end date has been set to:", end_date.strftime('%m/%d/%Y'))
         elif choice == '5':
             recording = True 
-            threading.Thread(target=record_audio, args=(duration, fs), daemon=True).start()
+            threading.Thread(target=record_audio, args=(beehive, duration, fs), daemon=True).start()
         elif choice == '6':
             print("RECORDING SHORTLY...")
             if not recording:
                 recording = True
-                threading.Thread(target=record_audio, args=(duration, fs), daemon=True).start()
+                threading.Thread(target=record_audio, args=(beehive, duration, fs), daemon=True).start()
             else:
                 print("Recording is already in progress.")
         elif choice == '7':
             print("You have chosen to record hourly.")
             if not recording:
                 recording = True
-                threading.Thread(target=record_hourly, args=(duration, fs), daemon=True).start()
+                threading.Thread(target=record_hourly, args=(beehive, duration, fs), daemon=True).start()
         elif choice == '8':
             recording = False
             print("\nRecording stopped, next recording will be the final file.")
