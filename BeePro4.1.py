@@ -1,5 +1,5 @@
 # ============================================================================================================================================
-# Program Name: "BeePro4.0"                                                                                                                  =
+# Program Name: "BeePro4.1"                                                                                                                  =
 # Program Description: This program is an improved version of BeePro3.0, which is used to record .wav files. The user will be prompted to    =
 #                      the duration and sample rate of the files. Then, they will be granted several different options to take the next      =
 #                      course of action as to how they would like to record (continuously, hourly, or set a start and end time/date).        =
@@ -15,9 +15,9 @@
 # Program Information:                                                                                                                       =
 #   Program Name: BeePro4.1                                                                                                                  =
 #   Program Languages: python                                                                                                                =
-#   Assemble: python3 BeePro4.0                                                                                                              =
-#   Date of last update: 08/30/2024                                                                                                          =
-#   Comments reorganized: 08/30/2024                                                                                                         =
+#   Assemble: python3 BeePro4.1.py                                                                                                           =
+#   Date of last update: 12/23/2024                                                                                                          =
+#   Comments reorganized: 12/23/2024                                                                                                         =
 #                                                                                                                                            =
 # Purpose:                                                                                                                                   =
 #   The purpose of this program is to record .wav audio files from beehives. The GUI has now changed to a CLI, whereas BeePro3.0 was using   =
@@ -38,7 +38,7 @@ from subprocess import call
 import time
 from datetime import datetime, date
 import sounddevice as sd
-#sd.default.device = 2
+sd.default.device = 1
 from scipy.io.wavfile import write
 import subprocess
 import os
@@ -56,8 +56,8 @@ dbx = dropbox.Dropbox(oauth2_access_token='sl.B7z7a04s9IBWQG8uF8-gOnGPFma9GB0dB6
                       app_secret='k7r1mm0p6afss5f')
 
 # Directory that recordings will go into. Will need to change for each Pi.
-directory_to_watch = "/media/rpi1/RPi1/BP-mic1/Recording"
-source_directory = "/media/rpi1/RPi1/BP-mic1"
+directory_to_watch = "/media/rpi2/'SSK Drive2'/BP-mic1/Recording"
+source_directory = "/media/rpi2/'SSK Drive2'/BP-mic1"
 
 
 # ===== upload_to_dropbox ====================================================================================================================
@@ -103,7 +103,7 @@ def record_audio(beehive, duration, fs):
             
         file_number += 1
         
-        move_files(source_directory, file_name, directory_to_watch)
+        #move_files(source_directory, file_name, directory_to_watch)
         
         if not recording:
             break  # Exit the loop when recording is stopped
@@ -239,7 +239,7 @@ def main():
     print(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print(" |           __          . '  '  .   ")
     print(" |        _/__)         .     .              .    Welcome to BeePro.")
-    print(" |     (8|)_}}--  .        .               .       Linux Version 4.0  ")
+    print(" |     (8|)_}}--  .        .               .       Linux Version 4.1  ")
     print(" |        `\__)     ' .  .  '  '  .   .  '    ")
     print(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
 
