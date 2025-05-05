@@ -41,7 +41,9 @@ import dropbox
 from dropbox.files import WriteMode
 import shutil
 import glob
+from dotenv import load_dotenv
 
+load_dotenv()
 recording = False
 
 # the Dropbox that audios will automatically get uploaded to
